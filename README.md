@@ -37,6 +37,7 @@ One of the metrics that measures the agent's winning stability is the standard d
 Epsilon was decayed over time from an initial value near 1 (meaning explore almost all the time) to an epsilon limit of 0.1 (meaning act optimally 90% of the time and explore 10% of the time). This encourages exploration at the beginning to gather experience and slowly starts favoring optimal actions over random exploratory actions.
 
 ![Training](/docs/tictactoe_ddqn_prb.png)
+*An agent that was trained for 34 minutes on an experience of around 100k games.*
 
 The agent's performance currently is far from optimal. It does prioritize blocking the opponent from winning in certain states, however in analogous but different states it prioritizes winning rather than blocking, not realizing that the opponent is one step away from winning the game. Since the reward for intermediate steps is equal, this is almost definitely a problem with the state value.
 
@@ -87,8 +88,6 @@ Win percentage: 75.0
 Win+Draw percentage: 82.8
 Loss percentage: 17.2
 ```
-
-The results above are of an agent that was trained for 34 minutes on an experience of around 100k games.
 
 ### `agent_vs_human.py`
 
