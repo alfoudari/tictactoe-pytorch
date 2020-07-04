@@ -1,0 +1,9 @@
+torch
+numpy
+gym
+tensorboard
+tensorboardX
+xando
+pytest
+scipy
+rlprop
