@@ -1,14 +1,14 @@
 import abc
 import random
-import gym
+import gymnasium as gym
 import numpy as np
 import warnings
 
 from itertools import chain
 from enum import Enum
-from gym import spaces
-from gym.utils import seeding
-from tictactoe import engine as tictactoe
+from gymnasium import spaces
+from gymnasium.utils import seeding
+from core.game import engine as tictactoe
 
 # https://stackoverflow.com/questions/40659212/futurewarning-elementwise-comparison-failed-returning-scalar-but-in-the-futur
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -37,9 +37,7 @@ class TicTacToeEnv(gym.Env):
                  )):
         # spaces
         self.action_space = spaces.Discrete(9)
-        self.observation_space = spaces.Tuple(
-            (spaces.Discrete(3),spaces.Discrete(3))
-        )
+        self.observation_space = spaces.Box(low=0, high=2, shape=(9,), dtype=np.int32)
 
         # game
         self._board = tictactoe.Board(verbose=board_verbose)
@@ -61,9 +59,6 @@ class TicTacToeEnv(gym.Env):
         self.stats = dict(
             games_played=0
         )
-
-        # do stuff
-        self.seed()
 
     def step(self, action):
         if self._done:
@@ -102,15 +97,21 @@ class TicTacToeEnv(gym.Env):
         else:
             reward = self.rewards['step']
             
-        return (self.state, reward, self._done, dict())
+        # Gymnasium API: return (obs, reward, terminated, truncated, info)
+        # terminated=True when episode ends naturally, truncated=False (not using truncation)
+        return (self.state, reward, self._done, False, dict())
 
-    def reset(self):
+    def reset(self, seed=None, options=None):
+        # Handle seed if provided (Gymnasium API)
+        if seed is not None:
+            random.seed(seed)
+
         # reset everything
         self._board.reset()
         self._first_move()
         self._done = False
-        # return an initial observation
-        return self.state
+        # return an initial observation and info dict (Gymnasium API)
+        return self.state, {}
 
     def render(self):
         pass
@@ -118,8 +119,8 @@ class TicTacToeEnv(gym.Env):
     def close(self):
         pass
 
-    def seed(self, seed=1):
-        random.seed(seed) # fixed seed
+    def seed(self, seed):
+        random.seed(seed)
 
     @abc.abstractmethod
     def player2_policy(self):
@@ -137,11 +138,11 @@ class TicTacToeEnv(gym.Env):
     def state(self):
         # flatten state
         board = self._board.board
-        return list(chain.from_iterable(board))
+        return np.array(list(chain.from_iterable(board)), dtype=np.int32)
 
     @property
     def observation_space_n(self):
-        return self.observation_space[0].n * self.observation_space[1].n
+        return self.observation_space.shape[0]
 
     @property
     def action_space_n(self):

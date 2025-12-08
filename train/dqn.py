@@ -4,10 +4,10 @@ import torch.optim as optim
 import argparse
 import sys
 import torch
-import gym
+import gymnasium as gym
 import env # module init needs to run
-from prop.algorithms.dqn import Agent
-from prop.net.feed_forward import FeedForward
+from core.algorithms.dqn import Agent
+from core.net.feed_forward import FeedForward
 
 class FCNet(FeedForward):
     def __init__(self, obs_size, n_actions):
@@ -76,8 +76,8 @@ if __name__ == "__main__":
                        win_rate=0.92, 
                        draw_rate=0.08
                     ))
-    env.spec.reward_threshold = env.performance_threshold
-    print(f"performance threshold: {env.performance_threshold}")
+    env.spec.reward_threshold = env.unwrapped.performance_threshold
+    print(f"performance threshold: {env.unwrapped.performance_threshold}")
 
     agent = Agent(
         env=env, 

@@ -38,9 +38,9 @@ if __name__ == '__main__':
     for n in range(args.num_games):
         start = time.time()
 
-        game.env.seed(start)
+        game.env.unwrapped.seed(start)
         game.play()
-        board = game.env._board
+        board = game.env.unwrapped._board
 
         if board.player_won:
             if board.player_won.side == Player.X.value:

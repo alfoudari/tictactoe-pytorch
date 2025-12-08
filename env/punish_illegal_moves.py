@@ -44,10 +44,11 @@ class TicTacToeEnv(BaseEnv):
                 # draw
                 reward = 1
 
-            return (self._state, reward, True, dict())
+            # Gymnasium API: return (obs, reward, terminated, truncated, info)
+            return (self._state, reward, True, False, dict())
         else:
             if illegal_move:
                 # end episode
-                return (self._state, -5, True, dict())
+                return (self._state, -5, True, False, dict())
             else:
-                return (self._state, 1, False, dict())
+                return (self._state, 1, False, False, dict())

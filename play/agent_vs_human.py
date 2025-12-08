@@ -21,7 +21,7 @@ if __name__ == '__main__':
     # start playing
     game.play()
 
-    board = game.env._board
+    board = game.env.unwrapped._board
     if board.player_won:
         if board.player_won.side == "X":
             print("AI won!")

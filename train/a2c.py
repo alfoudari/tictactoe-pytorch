@@ -7,10 +7,10 @@ import torch.optim as optim
 import argparse
 import sys
 import torch
-import gym
+import gymnasium as gym
 import env # module init needs to run
-from prop.algorithms.a2c import Agent
-from prop.net.feed_forward import FeedForward
+from core.algorithms.a2c import Agent
+from core.net.feed_forward import FeedForward
 
 class CNNNet(FeedForward):
     """ compute action probability distribution and state value """
