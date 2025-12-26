@@ -1,9 +1,8 @@
 
 import importlib
-import time
 import sys
 import torch
-import gym
+import gymnasium as gym
 from env.base import Player
 
 # mapping between algorithms and their module paths
@@ -53,9 +52,6 @@ class Game:
         
         self.env = gym.make(env, **kwargs)
 
-        # seed
-        self.env.seed(time.time())
-
     def load_model(self, policy):
         self.model = self.net(obs_size=9, n_actions=9)
         self.model.load_state_dict(torch.load(f"policies/{policy}"))
@@ -63,11 +59,11 @@ class Game:
 
     def play(self):
         # environment
-        obs = self.env.reset()
+        obs, info = self.env.reset()
 
         while True:
-            x = torch.Tensor(obs).reshape(self.env.observation_space_n)
-            mask = torch.zeros(self.env.action_space_n).index_fill(0, torch.LongTensor(self.env.legal_actions),  1)
+            x = torch.Tensor(obs).reshape(self.env.unwrapped.observation_space_n)
+            mask = torch.zeros(self.env.unwrapped.action_space_n).index_fill(0, torch.LongTensor(self.env.unwrapped.legal_actions),  1)
 
             if self.algorithm == "dqn":
                 y = self.model(x, mask)
@@ -80,7 +76,8 @@ class Game:
                 print(f"action distribution:\n{y.view(3,3)}")
                 print(f"action, max(action_dist): {action}, {torch.max(y)}\n")
 
-            obs, reward, done, _ = self.env.step(action)
+            obs, reward, terminated, truncated, info = self.env.step(action)
+            done = terminated or truncated
 
             if done:
                 break

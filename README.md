@@ -2,29 +2,51 @@
 
 This is a Tic-tac-toe game player trained with Reinforcement Learning.
 
-The player depends on a simple [backend][1] and a reinforcement learning [library][2] that I made. It starts by knowing nothing about the game and gains knowledge by playing against an automated player that plays randomly.
+The agent starts by knowing nothing about the game and gains knowledge by playing against an opponent that plays randomly.
 
 Player X is Player 1 and Player O is Player 2, I use them interchangeably. Player X is the agent and Player O is whatever you want it to be.
 
-My aim in creating this agent is to both understand Reinforcement Learning in terms of whats going on under the hood as well as train an agent that plays optimally. 
+My aim in creating this agent is to both understand Reinforcement Learning in terms of what's going on under the hood as well as train an agent that plays optimally. 
 
 Considering the following aspects of Tic-tac-toe:
 - It lives in a relatively small space (3x3) as opposed to Chess (8x8) or Go (19x19).
 - It is a solved game, meaning that optimal strategies exist and can be coded with hard rules.
 
-Therefore, it is reasonable to expect Reinforcement Learning to be able to learn an optimal strategy by getting better and better as it observes and learn from experience.
+Therefore, it is reasonable to expect Reinforcement Learning to be able to learn an optimal strategy by getting better and better as it observes and learns from experience.
+
+## Setup
+
+Create a virtual environment and install dependencies:
+
+```bash
+uv venv .venv
+source .venv/bin/activate
+uv pip install -r requirements.txt
+```
+
+To train a new model:
+
+```bash
+python -m train.dqn -device cpu
+```
+
+Monitor training progress with TensorBoard:
+
+```bash
+tensorboard --logdir=runs
+```
 
 ## Design
 
-I have used a [DQN algorithm][4] with the following enhancements:
+I have used a [DQN algorithm][2] with the following enhancements:
 - Double DQN - calculate state values according to actions selected by the current behavior policy rather than the target network.
-- Prioritized Replay Experience. [[paper]][5][[blog post]][6]
+- Prioritized Replay Experience. [[paper]][3][[blog post]][4]
 
 The prioritized replay experience in particular boosted learning in a big way and accelerated learning.
 
-For the neural network used to predict Q-values, I have used a Convolutional Neural Network since there are spatial relationships between data points (two X's next to eachother matter as opposed to two X's far from each other).
+For the neural network used to predict Q-values, I have used a Convolutional Neural Network since there are spatial relationships between data points (two X's next to each other matter as opposed to two X's far from each other).
 
-The environment is based on OpenAI gym and has a reward structure as follows:
+The environment is based on Gymnasium and has a reward structure as follows:
 - Win: +1
 - Lose: -1
 - Draw: 0.5
@@ -41,7 +63,7 @@ Epsilon was decayed over time from an initial value near 1 (meaning explore almo
 
 The agent's performance currently is far from optimal. It does prioritize blocking the opponent from winning in certain states, however in analogous but different states it prioritizes winning rather than blocking, not realizing that the opponent is one step away from winning the game. Since the reward for intermediate steps is equal, this is almost definitely a problem with the state value.
 
-There are a few improvements that I can make that should bring it closer to optimality. All improvements but the last one are from the [Rainbow DQN paper][3], namely:
+There are a few improvements that I can make that should bring it closer to optimality. All improvements but the last one are from the [Rainbow DQN paper][1], namely:
 - [ ] Adding noise to the neural network to further increase exploration.
 - [ ] Dueling DQN.
 - [ ] Periodically save the trained agent and use it *as an opponent* instead of playing against a random player all the time.
@@ -71,7 +93,7 @@ class Env(TicTacToeEnv):
 
 ## Play
 
-To play the game, you can run the following in `play/`:
+To play the game, run the following from the project root:
 
 ### `agent_vs_random.py`
 
@@ -91,7 +113,7 @@ Loss percentage: 17.2
 
 ### `agent_vs_human.py`
 
-Allows you to play against your trained agent. Player X (1) is the trained agent and Player O (2) is you. You can pass specify the first player in `fp` flag (example: `-fp=2`; default is player 1).
+Allows you to play against your trained agent. Player X (1) is the trained agent and Player O (2) is you. You can specify the first player with the `fp` flag (example: `-fp=2`; default is player 1).
 
 If you specify `-debug` then the neural network final layer values are printed, showing you what the agent thinks of each action on the board.
 
@@ -150,9 +172,7 @@ Enter cell coordinates (e.g. 1,2):
 and so on.
 
 
-[1]: https://github.com/abstractpaper/tictactoe
-[2]: https://github.com/abstractpaper/prop
-[3]: https://arxiv.org/abs/1710.02298
-[4]: https://en.wikipedia.org/wiki/Q-learning#Deep_Q-learning
-[5]: https://arxiv.org/abs/1511.05952
-[6]: https://danieltakeshi.github.io/2019/07/14/per/
+[1]: https://arxiv.org/abs/1710.02298
+[2]: https://en.wikipedia.org/wiki/Q-learning#Deep_Q-learning
+[3]: https://arxiv.org/abs/1511.05952
+[4]: https://danieltakeshi.github.io/2019/07/14/per/

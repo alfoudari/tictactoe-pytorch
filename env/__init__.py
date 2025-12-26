@@ -1,4 +1,4 @@
-from gym.envs.registration import registry, register, make, spec
+from gymnasium.envs.registration import registry, register, make, spec
 
 # register all environments here so gym.make() can get them.
 

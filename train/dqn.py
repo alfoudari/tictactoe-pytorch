@@ -4,10 +4,10 @@ import torch.optim as optim
 import argparse
 import sys
 import torch
-import gym
+import gymnasium as gym
 import env # module init needs to run
-from prop.algorithms.dqn import Agent
-from prop.net.feed_forward import FeedForward
+from core.algorithms.dqn import Agent
+from core.net.feed_forward import FeedForward
 
 class FCNet(FeedForward):
     def __init__(self, obs_size, n_actions):
@@ -52,9 +52,9 @@ class CNNNet(FeedForward):
 
     def forward(self, x, mask=[]):
         # transfrom from one tensor of shape (9) into 3 tensors of shape (3,3) each
-        empty = torch.zeros(x.size()).masked_scatter_((x == 0), torch.ones(x.size())).view(-1, 3, 3)
-        player1 = torch.zeros(x.size()).masked_scatter_((x == 1), torch.ones(x.size())).view(-1, 3, 3)
-        player2 = torch.zeros(x.size()).masked_scatter_((x == 2), torch.ones(x.size())).view(-1, 3, 3)
+        empty = torch.zeros(x.size(), device=x.device).masked_scatter_((x == 0), torch.ones(x.size(), device=x.device)).view(-1, 3, 3)
+        player1 = torch.zeros(x.size(), device=x.device).masked_scatter_((x == 1), torch.ones(x.size(), device=x.device)).view(-1, 3, 3)
+        player2 = torch.zeros(x.size(), device=x.device).masked_scatter_((x == 2), torch.ones(x.size(), device=x.device)).view(-1, 3, 3)
         cnn_input = torch.stack((empty, player1, player2), dim=1)
         return super(CNNNet, self).forward(cnn_input, mask)
 
@@ -76,8 +76,8 @@ if __name__ == "__main__":
                        win_rate=0.92, 
                        draw_rate=0.08
                     ))
-    env.spec.reward_threshold = env.performance_threshold
-    print(f"performance threshold: {env.performance_threshold}")
+    env.spec.reward_threshold = env.unwrapped.performance_threshold
+    print(f"performance threshold: {env.unwrapped.performance_threshold}")
 
     agent = Agent(
         env=env, 
@@ -96,4 +96,4 @@ if __name__ == "__main__":
     agent.train()
 
     print(f"#### stats ####")
-    print(f"games played: {env.stats['games_played']}")
+    print(f"games played: {env.unwrapped.stats['games_played']}")
